@@ -1,14 +1,23 @@
-// backend/db.js
+require('dotenv').config(); // Load environment variables from .env file
 const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('MongoDB connected');
-}).catch(err => {
-    console.error('MongoDB connection error:', err);
-});
-// Create a Schema for Users
+
+// Get the connection string from the environment variable
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    console.error('Error: MONGODB_URI is not defined in the .env file');
+    process.exit(1); // Exit the application if the URI is missing
+}
+
+mongoose.connect(MONGODB_URI)
+    .then(() => {
+        console.log('MongoDB connected');
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+    });
+
+// Define User and Account Schemas and Models (unchanged)
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -37,6 +46,7 @@ const userSchema = new mongoose.Schema({
         maxLength: 50
     }
 });
+
 const accountSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId, // Reference to User model
@@ -49,10 +59,8 @@ const accountSchema = new mongoose.Schema({
     }
 });
 
-// Create a model from the schema
+// Create Models
 const User = mongoose.model('User', userSchema);
 const Account = mongoose.model('Account', accountSchema);
-module.exports = {
-	User,
-    Account
-};
+
+module.exports = { User, Account };
